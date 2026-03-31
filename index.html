@@ -469,24 +469,27 @@ body {
 
 /* ─── PRINT STYLES ──────────────────────────────────────────── */
 @media print {
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
+    }
     body * { visibility: hidden; }
     .invoice-box, .invoice-box * { visibility: visible; }
     .invoice-box {
-        position: fixed;
+        position: absolute;
         top: 0; left: 0;
         width: 100%;
         box-shadow: none;
-        padding: 30px 40px;
+        padding: 0;
+        font-size: 11px;
     }
-    .btn-remove-row,
-    .inv-add-row,
-    .invoice-toolbar,
-    .inv-items select option { }
     .btn-remove-row { display: none; }
+    .inv-add-row { display: none; }
     .inv-items select { appearance: none; -webkit-appearance: none; }
     .inv-logo input[type="file"] { display: none; }
     [contenteditable] { border-bottom-color: transparent !important; }
 }
+    
 </style>
 </head>
 

@@ -588,6 +588,7 @@ function toggleMenu(id){
 /* ─── BILLING / INVOICE ───────────────────────────────────── */
 
 function loadBilling(){
+    saveCompanySetup();
     const invNum = "INV-" + String(invoiceCounter).padStart(4, "0");
     const today  = new Date().toLocaleDateString("en-ZA", { day:"2-digit", month:"long", year:"numeric" });
 
@@ -621,11 +622,14 @@ function loadBilling(){
                 <div class="inv-meta">
                     <div class="inv-bill-to">
                         <h4>Bill To</h4>
-                        <span contenteditable="true" style="font-weight:600; font-size:14px;">Client Name</span>
-                        <span contenteditable="true">Company / Individual</span>
-                        <span contenteditable="true">Address Line 1</span>
-                        <span contenteditable="true">City, Postal Code</span>
-                        <span contenteditable="true">email@client.com</span>
+                        <select id="client-select" onchange="fillClientDetails(this)" 
+                            style="font-weight:600; font-size:14px; border:none; background:transparent; 
+                            font-family:'DM Sans',sans-serif; cursor:pointer; margin-bottom:6px;">
+                            <option value="">— Select Client —</option>
+                            ${companyDatabase.map(c => `<option value="${c.name}">${c.name}</option>`).join("")}
+                        </select>
+                        <span contenteditable="true" id="client-reg"></span>
+                        <span contenteditable="true" id="client-email">email@client.com</span>
                     </div>
                     <div class="inv-details-grid">
                         <span class="label">Invoice #</span>
@@ -685,6 +689,12 @@ function loadBilling(){
 
     // Start with one empty row
     addInvoiceRow();
+}
+
+function fillClientDetails(select){
+    const company = companyDatabase.find(c => c.name === select.value);
+    if(!company) return;
+    document.getElementById("client-reg").innerText = company.reg;
 }
 
 function serviceOptions(){

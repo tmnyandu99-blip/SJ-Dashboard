@@ -85,7 +85,7 @@ body {
 }
 
 .sidebar.collapsed {
-    transform: translateX(-210px);
+    width: 60px;
 }
 
 /* expand main when sidebar collapsed */
@@ -117,8 +117,7 @@ body {
     flex: 1;
     padding: 20px;
     background: #f1f5f9;
-    overflow-x: auto;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .main.collapsed {
@@ -577,6 +576,26 @@ body {
 .main.collapsed + #main-toggle,
 body.collapsed #main-toggle {
     display: block;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed .menu-item span,
+.sidebar.collapsed .company-name {
+    display: none;
+}
+
+.sidebar,
+.main {
+    transition: all 0.25s ease-in-out;
 }
     
 </style>

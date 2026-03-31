@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SJ Financial Services</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ─── SIDEBAR ─────────────────────────────────── */
+.sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: #1e293b;
+    color: white;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: width 0.25s ease, min-width 0.25s ease;
+    flex-shrink: 0;
+}
+
+.sidebar.collapsed {
+    width: 64px;
+    min-width: 64px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 12px;
+    min-height: 60px;
+    flex-shrink: 0;
+}
+
+.sidebar-toggle {
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.company-name {
+    font-size: 16px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .company-name {
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+}
+
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 6px 0 16px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 2px 6px;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.menu-item:hover { background: #334155; }
+
+.menu-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    width: 22px;
+    text-align: center;
+}
+
+.menu-text {
+    font-size: 14px;
+    opacity: 1;
+    transition: opacity 0.15s ease;
+    overflow: hidden;
+}
+
+.sidebar.collapsed .menu-text {
+    opacity: 0;
+    width: 0;
+}
+
+.sidebar.collapsed .submenu {
+    display: none !important;
+}
+
+/* Submenu */
+.submenu {
+    display: none;
+    margin-left: 8px;
+}
+
+.submenu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    font-size: 13px;
+    background: #0f172a;
+    margin: 2px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.submenu-item:hover { background: #1e293b; }
+
+/* ─── MAIN ─────────────────────────────────────── */
+.main {
+    flex: 1;
+    padding: 24px;
+    background: #f1f5f9;
+    overflow: auto;
+    height: 100vh;
+}
+
+/* ─── TABLES ────────────────────────────────────── */
+.excel-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.excel-table th, .excel-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+    position: relative;
+    min-width: 100px;
+}
+
+.excel-table th {
+    background: #e2e8f0;
+    resize: horizontal;
+    overflow: auto;
+}
+
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.selected-row { background-color: #dbeafe !important; }
+
+/* ─── WIDGETS ─────────────────────────────────── */
+.widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.widget {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.widget:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+/* ─── COLUMN TOGGLE ──────────────────────────── */
+.col-toggles {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    font-size: 13px;
+}
+
+.col-toggles label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+/* ─── INVOICE STYLES ─────────────────────────── */
+.invoice-wrapper { max-width: 860px; margin: 0 auto; }
+
+.invoice-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.invoice-toolbar button {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.btn-print { background: #1e293b; color: white; }
+.btn-print:hover { background: #334155; }
+.btn-new { background: #e2e8f0; color: #1e293b; }
+.btn-new:hover { background: #cbd5e1; }
+
+.invoice-box {
+    background: white;
+    padding: 50px 55px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    color: #1e293b;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.inv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #1e293b;
+    padding-bottom: 24px;
+    margin-bottom: 30px;
+}
+
+.inv-logo {
+    width: 110px;
+    height: 80px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+    cursor: pointer;
+    background: #f8fafc;
+    position: relative;
+    overflow: hidden;
+}
+
+.inv-logo img { width: 100%; height: 100%; object-fit: contain; }
+
+.inv-logo input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.inv-firm-info { text-align: right; }
+
+.inv-firm-name {
+    font-family: 'EB Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.inv-firm-info p { margin: 2px 0; font-size: 12.5px; color: #475569; }
+
+.inv-firm-info [contenteditable] {
+    display: inline-block;
+    min-width: 160px;
+    outline: none;
+    border-bottom: 1px dashed transparent;
+    transition: border-color 0.2s;
+}
+
+.inv-firm-info [contenteditable]:hover,
+.inv-firm-info [contenteditable]:focus { border-bottom-color: #94a3b8; }
+
+.inv-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.inv-bill-to { flex: 1; }
+
+.inv-bill-to h4 {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin: 0 0 8px 0;
+}
+
+.inv-bill-to [contenteditable] {
+    display: block;
+    outline: none;
+    border-bottom: 1px dashed transparent;
+    padding: 2px 0;
+    min-width: 200px;
+    transition: border-color 0.2s;
+}
+
+.inv-bill-to [contenteditable]:hover,
+.inv-bill-to [contenteditable]:focus { border-bottom-color: #94a3b8; }
+
+.inv-details-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 20px;
+    font-size: 13px;
+    align-content: start;
+    text-align: right;
+}
+
+.inv-details-grid .label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+
+.inv-details-grid .value { font-weight: 500; }
+
+.inv-items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+}
+
+.inv-items thead tr { background: #1e293b; color: white; }
+
+.inv-items thead th {
+    padding: 10px 14px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-align: left;
+}
+
+.inv-items tbody tr { border-bottom: 1px solid #e2e8f0; }
+.inv-items tbody tr:hover { background: #f8fafc; }
+.inv-items tbody td { padding: 10px 14px; font-size: 13px; }
+.inv-items tbody td:nth-child(3) { text-align: right; }
+
+.inv-items select {
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #1e293b;
+    width: 100%;
+    cursor: pointer;
+}
+
+.inv-items select:focus { outline: none; }
+
+.inv-items td[contenteditable] {
+    outline: none;
+    border-bottom: 1px dashed transparent;
+    transition: border-color 0.2s;
+}
+
+.inv-items td[contenteditable]:hover,
+.inv-items td[contenteditable]:focus { border-bottom-color: #94a3b8; }
+
+.inv-items td.amount { font-weight: 500; font-variant-numeric: tabular-nums; }
+
+.btn-remove-row {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 4px;
+}
+
+.btn-remove-row:hover { color: #ef4444; }
+
+.inv-totals { display: flex; justify-content: flex-end; margin-bottom: 30px; }
+.inv-totals-box { width: 260px; }
+
+.inv-totals-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.inv-totals-row.total {
+    border-bottom: 2px solid #1e293b;
+    border-top: 2px solid #1e293b;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 10px 0;
+    margin-top: 4px;
+}
+
+.inv-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 12.5px;
+}
+
+.inv-footer h4 {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin: 0 0 8px 0;
+}
+
+.inv-footer p { margin: 3px 0; color: #475569; }
+
+.inv-footer [contenteditable] {
+    display: block;
+    outline: none;
+    border-bottom: 1px dashed transparent;
+    padding: 2px 0;
+    min-width: 180px;
+    color: #475569;
+    transition: border-color 0.2s;
+}
+
+.inv-footer [contenteditable]:hover,
+.inv-footer [contenteditable]:focus { border-bottom-color: #94a3b8; }
+
+.inv-add-row {
+    background: none;
+    border: 1px dashed #cbd5e1;
+    border-radius: 5px;
+    padding: 8px 18px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+}
+
+.inv-add-row:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+/* ─── PRINT ──────────────────────────────────── */
+@media print {
+    @page { size: A4 portrait; margin: 15mm; }
+    body * { visibility: hidden; }
+    .invoice-box, .invoice-box * { visibility: visible; }
+    .invoice-box {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        box-shadow: none;
+        padding: 0;
+        font-size: 11px;
+        overflow: hidden;
+    }
+    .btn-remove-row, .inv-add-row { display: none; }
+    .inv-items select { appearance: none; -webkit-appearance: none; }
+    .inv-logo input[type="file"] { display: none; }
+    [contenteditable] { border-bottom-color: transparent !important; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ─── SIDEBAR ─────────────────────────────── -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-toggle" onclick="toggleSidebar()">☰</div>
+        <div class="company-name">SJ Financial Services</div>
+    </div>
+
+    <div class="sidebar-nav">
+
+        <div class="menu-item">
+            <span class="menu-icon">📅</span>
+            <span class="menu-text">Due this week</span>
+        </div>
+
+        <div class="menu-item">
+            <span class="menu-icon">🗓️</span>
+            <span class="menu-text">Due this month</span>
+        </div>
+
+        <div class="menu-item" onclick="toggleSars()">
+            <span class="menu-icon">📋</span>
+            <span class="menu-text">SARS</span>
+        </div>
+        <div id="sars-submenu" class="submenu">
+            <div class="submenu-item" onclick="loadCompanyTaxes()">🏛️ Company Taxes</div>
+        </div>
+
+        <div class="menu-item" onclick="toggleCipc()">
+            <span class="menu-icon">🏢</span>
+            <span class="menu-text">CIPC</span>
+        </div>
+        <div id="cipc-submenu" class="submenu">
+            <div class="submenu-item" onclick="loadAnnualReturns()">📄 Annual Returns</div>
+        </div>
+
+        <div class="menu-item" onclick="toggleSecretarial()">
+            <span class="menu-icon">📝</span>
+            <span class="menu-text">Secretarial</span>
+        </div>
+        <div id="secretarial-submenu" class="submenu">
+            <div class="submenu-item">Company Registration</div>
+            <div class="submenu-item">Ultimate Beneficial Ownership (UBO)</div>
+            <div class="submenu-item">Compliance Checklist</div>
+            <div class="submenu-item">Public Officer Update</div>
+            <div class="submenu-item">Company Deregistration</div>
+            <div class="submenu-item">Company Reinstatement</div>
+            <div class="submenu-item">Director Changes</div>
+            <div class="submenu-item">SARS Appointments</div>
+        </div>
+
+        <div class="menu-item" onclick="toggleStaff()">
+            <span class="menu-icon">👥</span>
+            <span class="menu-text">Staff Workload</span>
+        </div>
+        <div id="staff-submenu" class="submenu">
+            <div class="submenu-item">Staff 1</div>
+            <div class="submenu-item">Staff 2</div>
+            <div class="submenu-item">Staff 3</div>
+            <div class="submenu-item">Staff 4</div>
+            <div class="submenu-item">Staff 5</div>
+        </div>
+
+        <div class="menu-item" onclick="toggleReports()">
+            <span class="menu-icon">📊</span>
+            <span class="menu-text">Reports</span>
+        </div>
+        <div id="reports-submenu" class="submenu">
+            <div class="submenu-item">SARS</div>
+            <div class="submenu-item">CIPC</div>
+            <div class="submenu-item">Secretarial</div>
+            <div class="submenu-item">Staff Workload</div>
+        </div>
+
+        <div class="menu-item" onclick="loadBilling()">
+            <span class="menu-icon">💰</span>
+            <span class="menu-text">Billing</span>
+        </div>
+
+        <div class="menu-item" onclick="toggleSettings()">
+            <span class="menu-icon">⚙️</span>
+            <span class="menu-text">Settings</span>
+        </div>
+        <div id="settings-submenu" class="submenu">
+            <div class="submenu-item" onclick="loadCompanySetup()">Company Setup</div>
+            <div class="submenu-item" onclick="loadStaffSetup()">Staff Setup</div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ─── MAIN ─────────────────────────────────── -->
+<div class="main" id="main-content">
+    <h1>Dashboard</h1>
+    <p>Select a menu item on the left.</p>
+</div>
+
+<script>
+
+let companyDatabase = JSON.parse(localStorage.getItem("companyDatabase")) || [];
+let staffDatabase   = JSON.parse(localStorage.getItem("staffDatabase"))   || [];
+let staffCounter    = 1;
+let invoiceCounter  = 1;
+
+const SERVICES = [
+    "VAT201",
+    "ITR14 / Company Tax",
+    "ITR12 / Personal Tax",
+    "AFS / Annual Financial Statements",
+    "CIPC Annual Returns",
+    "Payslips",
+    "Company Registration",
+    "Secretarial Services"
+];
+
+/* ─── SIDEBAR ───────────────────────────────── */
+
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("collapsed");
+}
+
+function toggleSars()        { toggleMenu("sars-submenu"); }
+function toggleCipc()        { toggleMenu("cipc-submenu"); }
+function toggleSecretarial() { toggleMenu("secretarial-submenu"); }
+function toggleStaff()       { toggleMenu("staff-submenu"); }
+function toggleSettings()    { toggleMenu("settings-submenu"); }
+function toggleReports()     { toggleMenu("reports-submenu"); }
+
+function toggleMenu(id){
+    const menu = document.getElementById(id);
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+/* ─── COMPANY SETUP ─────────────────────────── */
+
+function loadCompanySetup(){
+    document.getElementById("main-content").innerHTML = `
+        <h2>Company Setup</h2>
+        <div class="table-container">
+            <table class="excel-table">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Business Name</th>
+                        <th>Company Reg No.</th>
+                        <th>Registration Date</th>
+                        <th>AR</th>
+                        <th>EMP 201</th>
+                        <th>EMP 501</th>
+                        <th>Payslips</th>
+                        <th>ITR12</th>
+                        <th>IRPs</th>
+                        <th>VAT201</th>
+                        <th>IRP6</th>
+                        <th>AFS</th>
+                        <th>Tax RT</th>
+                    </tr>
+                </thead>
+                <tbody id="company-table-body">
+                    ${companyDatabase.length > 0
+                        ? companyDatabase.map(c => createRowFromData(c)).join("")
+                        : createRow()}
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <button onclick="addCompanyRow()">Add Company</button>
+        <button onclick="removeCompanyRow()">Remove Company</button>
+        <button onclick="exportCompanyData()">💾 Save Data</button>
+        <input type="file" id="import-company-file" accept=".csv" onchange="importCompanyData(event)" style="display:none">
+        <button onclick="document.getElementById('import-company-file').click()">📂 Load Data</button>
+    `;
+}
+
+function createRowFromData(c){
+    return `
+    <tr>
+        <td><input type="checkbox" class="row-select" onclick="toggleRowHighlight(this)"></td>
+        <td contenteditable="true">${c.name    || ""}</td>
+        <td contenteditable="true">${c.reg     || ""}</td>
+        <td contenteditable="true">${c.regDate || ""}</td>
+        ${yesNoDropdownVal(c.ar)}
+        ${yesNoDropdownVal(c.emp201)}
+        ${yesNoDropdownVal(c.emp501)}
+        ${yesNoDropdownVal(c.payslips)}
+        ${yesNoDropdownVal(c.itr12)}
+        ${yesNoDropdownVal(c.irps)}
+        ${vatDropdownVal(c.vat201)}
+        ${yesNoDropdownVal(c.irp6)}
+        ${yesNoDropdownVal(c.afs)}
+        ${yesNoDropdownVal(c.taxrt)}
+    </tr>`;
+}
+
+function yesNoDropdownVal(val){
+    return `<td><select>
+        <option value=""  ${!val || val===''  ? 'selected':''}></option>
+        <option ${val==='Yes' ? 'selected':''}>Yes</option>
+        <option ${val==='No'  ? 'selected':''}>No</option>
+    </select></td>`;
+}
+
+function vatDropdownVal(val){
+    return `<td><select>
+        <option value=""          ${!val || val===''          ? 'selected':''}></option>
+        <option ${val==='No'          ? 'selected':''}>No</option>
+        <option ${val==='Yes Group A' ? 'selected':''}>Yes Group A</option>
+        <option ${val==='Yes Group B' ? 'selected':''}>Yes Group B</option>
+    </select></td>`;
+}
+
+function createRow(){
+    return `
+    <tr>
+        <td><input type="checkbox" class="row-select" onclick="toggleRowHighlight(this)"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        ${yesNoDropdown()} ${yesNoDropdown()} ${yesNoDropdown()} ${yesNoDropdown()}
+        ${yesNoDropdown()} ${yesNoDropdown()} ${vatDropdown()}
+        ${yesNoDropdown()} ${yesNoDropdown()} ${yesNoDropdown()}
+    </tr>`;
+}
+
+function yesNoDropdown(){
+    return `<td><select><option value=""></option><option>Yes</option><option>No</option></select></td>`;
+}
+
+function vatDropdown(){
+    return `<td><select><option value=""></option><option>No</option><option>Yes Group A</option><option>Yes Group B</option></select></td>`;
+}
+
+function addCompanyRow(){
+    document.getElementById("company-table-body").insertAdjacentHTML("beforeend", createRow());
+}
+
+function removeCompanyRow(){
+    const table = document.getElementById("company-table-body");
+    const rows  = table.querySelectorAll("tr");
+    let deleted = false;
+    rows.forEach((row, index) => {
+        const cb = row.querySelector(".row-select");
+        if(cb && cb.checked){ table.deleteRow(index); deleted = true; }
+    });
+    if(!deleted) alert("Please select a company to delete.");
+}
+
+function saveCompanySetup(){
+    const rows = document.querySelectorAll("#company-table-body tr");
+    if(!rows.length) return;
+    companyDatabase = [];
+    rows.forEach(row => {
+        const cells = row.cells;
+        if(!cells || cells.length < 14) return;
+        const company = {
+            name:    cells[1].innerText.trim(),
+            reg:     cells[2].innerText.trim(),
+            regDate: cells[3].innerText.trim(),
+            ar:      cells[4].querySelector("select")?.value  || "",
+            emp201:  cells[5].querySelector("select")?.value  || "",
+            emp501:  cells[6].querySelector("select")?.value  || "",
+            payslips:cells[7].querySelector("select")?.value  || "",
+            itr12:   cells[8].querySelector("select")?.value  || "",
+            irps:    cells[9].querySelector("select")?.value  || "",
+            vat201:  cells[10].querySelector("select")?.value || "",
+            irp6:    cells[11].querySelector("select")?.value || "",
+            afs:     cells[12].querySelector("select")?.value || "",
+            taxrt:   cells[13].querySelector("select")?.value || ""
+        };
+        if(company.name) companyDatabase.push(company);
+    });
+    localStorage.setItem("companyDatabase", JSON.stringify(companyDatabase));
+}
+
+/* ─── CSV EXPORT / IMPORT ─────────────────────── */
+
+function exportCompanyData(){
+    saveCompanySetup();
+    const headers = ["name","reg","regDate","ar","emp201","emp501","payslips","itr12","irps","vat201","irp6","afs","taxrt"];
+    const rows = [headers.join(",")];
+    companyDatabase.forEach(c => {
+        rows.push(headers.map(h => `"${(c[h]||"").replace(/"/g,'""')}"`).join(","));
+    });
+    downloadFile(rows.join("\n"), "sj-companies.csv", "text/csv");
+}
+
+function importCompanyData(event){
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+        const lines   = e.target.result.split("\n").filter(l => l.trim());
+        const headers = lines[0].split(",").map(h => h.replace(/"/g,"").trim());
+        companyDatabase = [];
+        for(let i = 1; i < lines.length; i++){
+            const values  = parseCSVLine(lines[i]);
+            const company = {};
+            headers.forEach((h, idx) => { company[h] = values[idx] || ""; });
+            if(company.name && company.name.trim()) companyDatabase.push(company);
+        }
+        localStorage.setItem("companyDatabase", JSON.stringify(companyDatabase));
+        alert("Company data loaded successfully!");
+        loadCompanySetup();
+    };
+    reader.readAsText(file);
+}
+
+function exportStaffData(){
+    saveStaffSetup();
+    const headers = ["number","name","id","tax","email","phone","startDate","role"];
+    const rows = [headers.join(",")];
+    staffDatabase.forEach(s => {
+        rows.push(headers.map(h => `"${(s[h]||"").replace(/"/g,'""')}"`).join(","));
+    });
+    downloadFile(rows.join("\n"), "sj-staff.csv", "text/csv");
+}
+
+function importStaffData(event){
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+        const lines   = e.target.result.split("\n").filter(l => l.trim());
+        const headers = lines[0].split(",").map(h => h.replace(/"/g,"").trim());
+        staffDatabase = [];
+        for(let i = 1; i < lines.length; i++){
+            const values = parseCSVLine(lines[i]);
+            const staff  = {};
+            headers.forEach((h, idx) => { staff[h] = values[idx] || ""; });
+            if(staff.name && staff.name.trim()) staffDatabase.push(staff);
+        }
+        localStorage.setItem("staffDatabase", JSON.stringify(staffDatabase));
+        alert("Staff data loaded successfully!");
+        loadStaffSetup();
+    };
+    reader.readAsText(file);
+}
+
+function parseCSVLine(line){
+    const result = [];
+    let current  = "";
+    let inQuotes = false;
+    for(let i = 0; i < line.length; i++){
+        if(line[i] === '"'){ inQuotes = !inQuotes; }
+        else if(line[i] === ',' && !inQuotes){ result.push(current); current = ""; }
+        else { current += line[i]; }
+    }
+    result.push(current);
+    return result;
+}
+
+function downloadFile(content, filename, type){
+    const blob = new Blob([content], { type });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+/* ─── STAFF SETUP ────────────────────────────── */
+
+function loadStaffSetup(){
+    document.getElementById("main-content").innerHTML = `
+        <h2>Staff Setup</h2>
+        <div class="table-container"><table class="excel-table">
+            <thead><tr>
+                <th>Select</th><th>Staff Number</th><th>Staff Name</th><th>ID Number</th>
+                <th>Tax Number</th><th>Email</th><th>Phone</th><th>Start Date</th><th>Role</th>
+            </tr></thead>
+            <tbody id="staff-table-body">
+                ${staffDatabase.length > 0
+                    ? staffDatabase.map(s => createStaffRowFromData(s)).join("")
+                    : createStaffRow()}
+            </tbody>
+        </table></div><br>
+        <button onclick="addStaffRow()">Add Staff</button>
+        <button onclick="removeStaffRow()">Remove Staff</button>
+        <button onclick="exportStaffData()">💾 Save Data</button>
+        <input type="file" id="import-staff-file" accept=".csv" onchange="importStaffData(event)" style="display:none">
+        <button onclick="document.getElementById('import-staff-file').click()">📂 Load Data</button>
+    `;
+}
+
+function createStaffRowFromData(s){
+    return `<tr>
+        <td><input type="checkbox" class="row-select" onclick="toggleRowHighlight(this)"></td>
+        <td>${s.number || ""}</td>
+        <td contenteditable="true">${s.name      || ""}</td>
+        <td contenteditable="true">${s.id        || ""}</td>
+        <td contenteditable="true">${s.tax       || ""}</td>
+        <td contenteditable="true">${s.email     || ""}</td>
+        <td contenteditable="true">${s.phone     || ""}</td>
+        <td contenteditable="true">${s.startDate || ""}</td>
+        <td contenteditable="true">${s.role      || ""}</td>
+    </tr>`;
+}
+
+function generateStaffNumber(){
+    return "SJ" + String(staffCounter++).padStart(3, "0");
+}
+
+function createStaffRow(){
+    return `<tr>
+        <td><input type="checkbox" class="row-select" onclick="toggleRowHighlight(this)"></td>
+        <td>${generateStaffNumber()}</td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+    </tr>`;
+}
+
+function addStaffRow(){
+    document.getElementById("staff-table-body").insertAdjacentHTML("beforeend", createStaffRow());
+}
+
+function removeStaffRow(){
+    const table = document.getElementById("staff-table-body");
+    table.querySelectorAll("tr").forEach((row, index) => {
+        const cb = row.querySelector(".row-select");
+        if(cb && cb.checked) table.deleteRow(index);
+    });
+}
+
+function saveStaffSetup(){
+    const rows = document.querySelectorAll("#staff-table-body tr");
+    if(!rows.length) return;
+    staffDatabase = [];
+    rows.forEach(row => {
+        const cells = row.cells;
+        if(!cells || cells.length < 9) return;
+        const staff = {
+            number:    cells[1].innerText.trim(),
+            name:      cells[2].innerText.trim(),
+            id:        cells[3].innerText.trim(),
+            tax:       cells[4].innerText.trim(),
+            email:     cells[5].innerText.trim(),
+            phone:     cells[6].innerText.trim(),
+            startDate: cells[7].innerText.trim(),
+            role:      cells[8].innerText.trim()
+        };
+        if(staff.name) staffDatabase.push(staff);
+    });
+    localStorage.setItem("staffDatabase", JSON.stringify(staffDatabase));
+}
+
+function toggleRowHighlight(checkbox){
+    const row = checkbox.closest("tr");
+    checkbox.checked ? row.classList.add("selected-row") : row.classList.remove("selected-row");
+}
+
+/* ─── SARS — COMPANY TAXES ───────────────────── */
+
+function loadCompanyTaxes(){
+    document.getElementById("main-content").innerHTML = `
+        <h2>SARS — Company Taxes</h2>
+        <div class="widgets">
+            <div class="widget" onclick="loadEMP201()">EMP201</div>
+            <div class="widget" onclick="loadEMP501()">EMP501</div>
+            <div class="widget" onclick="loadVAT201()">VAT201</div>
+            <div class="widget" onclick="loadIRP6()">IRP6</div>
+            <div class="widget" onclick="loadITR14()">ITR14</div>
+            <div class="widget" onclick="loadITR12()">ITR12</div>
+            <div class="widget" onclick="loadIRP5()">IRP5/IT3a</div>
+        </div>`;
+}
+
+/* EMP201 — months + column show/hide + notes */
+function loadEMP201(){
+    saveCompanySetup();
+    const months = ["March","April","May","June","July","August","September","October","November","December","January","February"];
+
+    document.getElementById("main-content").innerHTML = `
+        <h2>SARS — EMP201</h2>
+        <div class="col-toggles">
+            <strong style="margin-right:8px;">Show / Hide Columns:</strong>
+            ${months.map((m, i) => `
+                <label>
+                    <input type="checkbox" checked onchange="toggleEMP201Col(${i + 1})"> ${m}
+                </label>
+            `).join("")}
+        </div>
+        <div class="table-container">
+        <table class="excel-table" id="emp201-table">
+            <thead><tr>
+                <th>Business Name</th>
+                ${months.map(m => `<th>${m}</th>`).join("")}
+                <th>Notes</th>
+            </tr></thead>
+            <tbody id="emp201-body"></tbody>
+        </table></div>
+    `;
+
+    const body = document.getElementById("emp201-body");
+    companyDatabase.forEach(company => {
+        if(company.emp201 === "Yes"){
+            const row = body.insertRow();
+            row.insertCell().innerText = company.name;
+            for(let i = 0; i < 12; i++){
+                const cell = row.insertCell();
+                cell.contentEditable = "true";
+                cell.dataset.col = i + 1;
+            }
+            row.insertCell().contentEditable = "true";
+        }
+    });
+
+    setTimeout(enableColumnResize, 100);
+}
+
+function toggleEMP201Col(colIndex){
+    const table = document.getElementById("emp201-table");
+    if(!table) return;
+    table.querySelectorAll("tr").forEach(row => {
+        const cell = row.cells[colIndex];
+        if(cell) cell.style.display = cell.style.display === "none" ? "" : "none";
+    });
+}
+
+/* EMP501 — Business Name, Year of Assessment, Notes */
+function loadEMP501(){
+    saveCompanySetup();
+    document.getElementById("main-content").innerHTML = `
+        <h2>SARS — EMP501</h2>
+        <div class="table-container">
+        <table class="excel-table">
+            <thead><tr>
+                <th>Business Name</th>
+                <th>Year of Assessment</th>
+                <th>Notes</th>
+            </tr></thead>
+            <tbody id="emp501-body"></tbody>
+        </table></div>
+    `;
+    const body = document.getElementById("emp501-body");
+    companyDatabase.forEach(company => {
+        if(company.emp501 === "Yes"){
+            const row = body.insertRow();
+            row.insertCell().innerText   = company.name;
+            row.insertCell().contentEditable = "true";
+            row.insertCell().contentEditable = "true";
+        }
+    });
+    setTimeout(enableColumnResize, 100);
+}
+
+/* VAT201 — Group A & B each with Notes */
+function loadVAT201(){
+    saveCompanySetup();
+    document.getElementById("main-content").innerHTML = `
+        <h2>SARS — VAT201</h2>
+        <h3>VAT201 Group A</h3>
+        <div class="table-container"><table class="excel-table">
+            <thead><tr>
+                <th>Business Name</th><th>March</th><th>May</th><th>June</th>
+                <th>August</th><th>September</th><th>November</th><th>January</th>
+                <th>Notes</th>
+            </tr></thead>
+            <tbody id="vat201-body-a"></tbody>
+        </table></div><br>
+        <h3>VAT201 Group B</h3>
+        <div class="table-container"><table class="excel-table">
+            <thead><tr>
+                <th>Business Name</th><th>April</th><th>July</th>
+                <th>October</th><th>December</th><th>February</th>
+                <th>Notes</th>
+            </tr></thead>
+            <tbody id="vat201-body-b"></tbody>
+        </table></div>
+    `;
+
+    const bodyA = document.getElementById("vat201-body-a");
+    const bodyB = document.getElementById("vat201-body-b");
+
+    companyDatabase.forEach(company => {
+        if(company.vat201 === "Yes Group A"){
+            const row = bodyA.insertRow();
+            row.insertCell().innerText = company.name;
+            for(let i = 0; i < 7; i++) row.insertCell().contentEditable = "true";
+            row.insertCell().contentEditable = "true"; // Notes
+        }
+        if(company.vat201 === "Yes Group B"){
+            const row = bodyB.insertRow();
+            row.insertCell().innerText = company.name;
+            for(let i = 0; i < 5; i++) row.insertCell().contentEditable = "true";
+            row.insertCell().contentEditable = "true"; // Notes
+        }
+    });
+
+    setTimeout(enableColumnResize, 100);
+}
+
+/* IRP6 — Business Name, Half Yearly, Yearly, Notes */
+function loadIRP6(){
+    saveCompanySetup();
+    document.getElementById("main-content").innerHTML = `
+        <h2>SARS — IRP6</h2>
+        <div class="table-container">
+        <table class="excel-table">
+            <thead><tr>
+                <th>Business Name</th>
+                <th>Half Yearly</th>
+                <th>Yearly</th>
+                <th>Notes</th>
+            </tr></thead>
+            <tbody id="irp6-body"></tbody>
+        </table></div>
+    `;
+    const body = document.getElementById("irp6-body");
+    companyDatabase.forEach(company => {
+        if(company.irp6 === "Yes"){
+            const row = body.insertRow();
+            row.insertCell().innerText       = company.name;
+            row.insertCell().contentEditable = "true";
+            row.insertCell().contentEditable = "true";
+            row.insertCell().contentEditable = "true";
+        }
+    });
+    setTimeout(enableColumnResize, 100);
+}
+
+/* ITR14 — Business Name, Year of Assessment, Notes */
+function loadITR14(){
+    saveCompanySetup();
+    document.getElementById("main-content").innerHTML = `
+        <h2>SARS — ITR14</h2>
+        <div class="table-container">
+        <table class="excel-table">
+            <thead><tr>
+                <th>Business Name</th>
+                <th>Year of Assessment</th>
+                <th>Notes</th>
+            </tr></thead>
+            <tbody id="itr14-body"></tbody>
+        </table></div>
+    `;
+    const body = document.getElementById("itr14-body");
+    companyDatabase.forEach(company => {
+        if(company.taxrt === "Yes"){
+            const row = body.insertRow();
+            row.insertCell().innerText       = company.name;
+            row.insertCell().contentEditable = "true";
+            row.insertCell().contentEditable = "true";
+        }
+    });
+    setTimeout(enableColumnResize, 100);
+}
+
+/* ITR12 — Individual Name, Year of Assessment, Notes */
+function loadITR12(){
+    saveCompanySetup();
+    document.getElementById("main-content").innerHTML = `
+        <h2>SARS — ITR12</h2>
+        <div class="table-container">
+        <table class="excel-table">
+            <thead><tr>
+                <th>Individual Name</th>
+                <th>Year of Assessment</th>
+                <th>Notes</th>
+            </tr></thead>
+            <tbody id="itr12-body"></tbody>
+        </table></div>
+    `;
+    const body = document.getElementById("itr12-body");
+    companyDatabase.forEach(company => {
+        if(company.itr12 === "Yes"){
+            const row = body.insertRow();
+            row.insertCell().innerText       = company.name;
+            row.insertCell().contentEditable = "true";
+            row.insertCell().contentEditable = "true";
+        }
+    });
+    setTimeout(enableColumnResize, 100);
+}
+
+/* IRP5/IT3a — same layout as EMP501 */
+function loadIRP5(){
+    saveCompanySetup();
+    document.getElementById("main-content").innerHTML = `
+        <h2>SARS — IRP5/IT3a</h2>
+        <div class="table-container">
+        <table class="excel-table">
+            <thead><tr>
+                <th>Business Name</th>
+                <th>Year of Assessment</th>
+                <th>Notes</th>
+            </tr></thead>
+            <tbody id="irp5-body"></tbody>
+        </table></div>
+    `;
+    const body = document.getElementById("irp5-body");
+    companyDatabase.forEach(company => {
+        if(company.emp501 === "Yes"){
+            const row = body.insertRow();
+            row.insertCell().innerText       = company.name;
+            row.insertCell().contentEditable = "true";
+            row.insertCell().contentEditable = "true";
+        }
+    });
+    setTimeout(enableColumnResize, 100);
+}
+
+/* ─── CIPC — ANNUAL RETURNS ──────────────────── */
+
+function loadAnnualReturns(){
+    saveCompanySetup();
+    document.getElementById("main-content").innerHTML = `
+        <h2>CIPC — Annual Returns</h2>
+        <div class="table-container"><table class="excel-table">
+            <thead><tr>
+                <th>Business Name</th><th>Company Registration</th>
+                <th>Registration Date</th><th>Month</th><th>Notes</th>
+            </tr></thead>
+            <tbody id="ar-body"></tbody>
+        </table></div>`;
+
+    const body = document.getElementById("ar-body");
+    companyDatabase.forEach(company => {
+        if(company.ar === "Yes"){
+            const row = body.insertRow();
+            row.insertCell().innerText = company.name;
+            row.insertCell().innerText = company.reg;
+            row.insertCell().innerText = company.regDate;
+            const monthCell = row.insertCell();
+            if(company.regDate){
+                const date = new Date(company.regDate);
+                monthCell.innerText = isNaN(date) ? "" : date.toLocaleString('default', { month: 'long' });
+            }
+            row.insertCell().contentEditable = "true";
+        }
+    });
+    setTimeout(enableColumnResize, 100);
+}
+
+/* ─── BILLING ────────────────────────────────── */
+
+function loadBilling(){
+    saveCompanySetup();
+    const invNum = "INV-" + String(invoiceCounter).padStart(4, "0");
+    const today  = new Date().toLocaleDateString("en-ZA", { day:"2-digit", month:"long", year:"numeric" });
+
+    document.getElementById("main-content").innerHTML = `
+        <div class="invoice-wrapper">
+            <div class="invoice-toolbar">
+                <button class="btn-print" onclick="window.print()">🖨 Print / Save as PDF</button>
+                <button class="btn-new"   onclick="newInvoice()">+ New Invoice</button>
+            </div>
+            <div class="invoice-box" id="invoice-box">
+
+                <div class="inv-header">
+                    <div class="inv-logo" title="Click to upload logo">
+                        <span id="logo-label">Click to<br>upload logo</span>
+                        <img id="logo-img" src="" style="display:none;">
+                        <input type="file" accept="image/*" onchange="uploadLogo(event)">
+                    </div>
+                    <div class="inv-firm-info">
+                        <div class="inv-firm-name">SJ Financial Services</div>
+                        <p><span contenteditable="true">123 Example Street</span></p>
+                        <p><span contenteditable="true">Johannesburg, 2000</span></p>
+                        <p>📞 <span contenteditable="true">+27 11 000 0000</span></p>
+                        <p>✉ <span contenteditable="true">info@sjfinancial.co.za</span></p>
+                    </div>
+                </div>
+
+                <div class="inv-meta">
+                    <div class="inv-bill-to">
+                        <h4>Bill To</h4>
+                        <select id="client-select" onchange="fillClientDetails(this)"
+                            style="font-weight:600; font-size:14px; border:none; background:transparent;
+                            font-family:'DM Sans',sans-serif; cursor:pointer; margin-bottom:6px;">
+                            <option value="">— Select Client —</option>
+                            ${companyDatabase.map(c => `<option value="${c.name}">${c.name}</option>`).join("")}
+                        </select>
+                        <span contenteditable="true" id="client-reg"></span>
+                        <span contenteditable="true" id="client-email">email@client.com</span>
+                    </div>
+                    <div class="inv-details-grid">
+                        <span class="label">Invoice #</span>
+                        <span class="value">${invNum}</span>
+                        <span class="label">Date</span>
+                        <span class="value">${today}</span>
+                        <span class="label">Due Date</span>
+                        <span class="value" contenteditable="true">On Receipt</span>
+                    </div>
+                </div>
+
+                <table class="inv-items">
+                    <thead><tr>
+                        <th style="width:40%">Service</th>
+                        <th>Description</th>
+                        <th style="width:110px">Amount (R)</th>
+                        <th style="width:30px"></th>
+                    </tr></thead>
+                    <tbody id="inv-items-body"></tbody>
+                </table>
+
+                <button class="inv-add-row" onclick="addInvoiceRow()">+ Add Line Item</button>
+
+                <div class="inv-totals">
+                    <div class="inv-totals-box">
+                        <div class="inv-totals-row total">
+                            <span>TOTAL</span>
+                            <span id="inv-total">R 0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inv-footer">
+                    <div>
+                        <h4>Banking Details</h4>
+                        <p>Bank: <span contenteditable="true">Bank Name</span></p>
+                        <p>Account Name: <span contenteditable="true">SJ Financial Services</span></p>
+                        <p>Account No: <span contenteditable="true">000 000 0000</span></p>
+                        <p>Branch Code: <span contenteditable="true">000000</span></p>
+                        <p>Account Type: <span contenteditable="true">Cheque / Current</span></p>
+                    </div>
+                    <div>
+                        <h4>Notes</h4>
+                        <span contenteditable="true" style="display:block; min-height:60px; min-width:220px;">Thank you for your business.</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    `;
+    addInvoiceRow();
+}
+
+function fillClientDetails(select){
+    const company = companyDatabase.find(c => c.name === select.value);
+    if(!company) return;
+    document.getElementById("client-reg").innerText = company.reg;
+}
+
+function addInvoiceRow(){
+    const tbody = document.getElementById("inv-items-body");
+    if(!tbody) return;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td>
+            <select onchange="updateTotal()">
+                <option value="">— Select Service —</option>
+                ${SERVICES.map(s => `<option>${s}</option>`).join("")}
+            </select>
+        </td>
+        <td contenteditable="true" style="color:#64748b; font-style:italic;"
+            onfocus="if(this.innerText==='Optional note')this.innerText=''"
+            onblur="if(this.innerText==='')this.innerText='Optional note'">Optional note</td>
+        <td contenteditable="true" class="amount" oninput="updateTotal()">0.00</td>
+        <td><button class="btn-remove-row" onclick="removeInvoiceRow(this)">×</button></td>
+    `;
+    tbody.appendChild(tr);
+    updateTotal();
+}
+
+function removeInvoiceRow(btn){
+    btn.closest("tr").remove();
+    updateTotal();
+}
+
+function updateTotal(){
+    let total = 0;
+    document.querySelectorAll("#inv-items-body .amount").forEach(cell => {
+        const val = parseFloat(cell.innerText.replace(/[^0-9.]/g, ""));
+        if(!isNaN(val)) total += val;
+    });
+    const el = document.getElementById("inv-total");
+    if(el) el.textContent = "R " + total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function newInvoice(){ invoiceCounter++; loadBilling(); }
+
+function uploadLogo(event){
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+        document.getElementById("logo-img").src = e.target.result;
+        document.getElementById("logo-img").style.display = "block";
+        document.getElementById("logo-label").style.display = "none";
+    };
+    reader.readAsDataURL(file);
+}
+
+/* ─── HELPERS ────────────────────────────────── */
+
+function enableColumnResize(){
+    document.querySelectorAll(".excel-table th").forEach(th => {
+        th.style.resize   = "horizontal";
+        th.style.overflow = "auto";
+    });
+}
+
+</script>
+</body>
+</html>

@@ -41,6 +41,36 @@ body {
     background: #334155;
 }
 
+/* ─── SIDEBAR COLLAPSE ───────────────────────────── */
+
+.sidebar {
+    transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed {
+    transform: translateX(-100%);
+}
+
+/* expand main when sidebar collapsed */
+.main.expanded {
+    margin-left: 0;
+}
+
+/* hamburger button */
+#sidebar-toggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #1e293b;
+    color: white;
+    font-size: 20px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 10000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
 /* Submenu */
 .submenu {
     display: none;
@@ -533,6 +563,7 @@ body.collapsed #main-toggle {
 <body>
 
 <div class="sidebar">
+    <div id="sidebar-toggle" onclick="toggleSidebar()">☰</div>
     <div class="company-name">SJ Financial Services</div>
 
     <div class="menu-item"> Due this week</div>
@@ -1094,6 +1125,14 @@ function toggleMain(){
     } else {
         document.body.classList.remove("collapsed");
     }
+}
+
+function toggleSidebar(){
+    const sidebar = document.querySelector(".sidebar");
+    const main = document.querySelector(".main");
+
+    sidebar.classList.toggle("collapsed");
+    main.classList.toggle("expanded");
 }
     
 </script>

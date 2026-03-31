@@ -41,14 +41,48 @@ body {
     background: #334155;
 }
 
+/* Sidebar header layout */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+/* Company name */
+.company-name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Hamburger */
+#sidebar-toggle {
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+#sidebar-toggle:hover {
+    background: rgba(255,255,255,0.15);
+}
+
 /* ─── SIDEBAR COLLAPSE ───────────────────────────── */
 
 .sidebar {
+    width: 260px;
+    background: #1e293b;
+    color: white;
+    height: 100vh;
+    padding: 20px;
+    overflow-y: auto;
     transition: transform 0.3s ease;
+    position: relative;
 }
 
 .sidebar.collapsed {
-    transform: translateX(-100%);
+    transform: translateX(-220px);
 }
 
 /* expand main when sidebar collapsed */
@@ -563,8 +597,10 @@ body.collapsed #main-toggle {
 <body>
 
 <div class="sidebar">
-    <div id="sidebar-toggle" onclick="toggleSidebar()">☰</div>
+    <div class="sidebar-header">
     <div class="company-name">SJ Financial Services</div>
+    <div id="sidebar-toggle" onclick="toggleSidebar()">☰</div>
+</div>
 
     <div class="menu-item"> Due this week</div>
     <div class="menu-item"> Due this month</div>

@@ -556,7 +556,7 @@ body {
 </div>
 
 <script>
-let companyDatabase = [];
+let companyDatabase = JSON.parse(localStorage.getItem("companyDatabase")) || [];
 let staffCounter = 1;
 let invoiceCounter = 1;
 
@@ -849,6 +849,8 @@ function saveCompanySetup(){
         };
         if(company.name.trim() !== "") companyDatabase.push(company);
     });
+
+    localStorage.setItem("companyDatabase", JSON.stringify(companyDatabase));
 }
 
 function toggleRowHighlight(checkbox){
